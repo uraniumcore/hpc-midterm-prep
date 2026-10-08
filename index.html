@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>HPC Midterm Prep • 50 Questions Practice</title>
+  <meta name="description" content="High Performance Computing & Big Data Midterm Practice Quiz with Question & Option Shuffling, Instant Feedback, and Moodle Exam Simulator.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="container">
+    <!-- Header -->
+    <header>
+      <div class="header-top">
+        <div class="logo-area">
+          <span class="logo-icon">⚡</span>
+          <div>
+            <h1>HPC Midterm Prep</h1>
+            <div class="subtitle">High Performance Computing & Big Data • 50 Questions Pool</div>
+          </div>
+        </div>
+        <div class="header-actions">
+          <button id="soundToggleBtn" class="btn-icon" title="Toggle Sound (Web Audio)" aria-label="Toggle Sound">🔊</button>
+          <button id="themeToggleBtn" class="btn-icon" title="Toggle Dark/Light Mode" aria-label="Toggle Theme">🌙</button>
+          <button id="resetProgressBtn" class="btn-icon" title="Reset Answers & History" aria-label="Reset Progress">🗑️</button>
+        </div>
+      </div>
+
+      <!-- Lecturer Notice Banner -->
+      <div class="notice-banner">
+        <div class="notice-icon">📢</div>
+        <div>
+          <strong>Midterm Quiz Notice:</strong> Friday at 10:30 AM in Moodle (bring your own laptop). 
+          These 50 questions represent ~50% of the midterm exam question pool!
+        </div>
+      </div>
+
+      <!-- Navigation Tabs -->
+      <nav class="tabs-nav">
+        <button class="tab-btn active" data-tab="practice">🎯 Practice (Instant Feedback)</button>
+        <button class="tab-btn" data-tab="exam">⏱️ Exam Simulation</button>
+        <button class="tab-btn" data-tab="flashcards">🃏 Flashcards</button>
+        <button class="tab-btn" data-tab="list">📋 All Questions & Cheat Sheet</button>
+      </nav>
+
+      <!-- Shuffling & Controls Bar -->
+      <div class="controls-bar">
+        <div class="shuffle-toggles">
+          <label class="toggle-label" title="Shuffle questions order on reshuffle">
+            <input type="checkbox" id="shuffleQuestionsToggle" checked>
+            <span>🔀 Shuffle Questions</span>
+          </label>
+          <label class="toggle-label" title="Shuffle answer options (A-E) order for every question">
+            <input type="checkbox" id="shuffleOptionsToggle" checked>
+            <span>🔀 Shuffle Options (A–E)</span>
+          </label>
+        </div>
+        <div class="shuffle-actions">
+          <button id="reshuffleBtn" class="btn-sm btn-accent" title="Reshuffle current questions and choices">
+            <span>🎲</span> Reshuffle Now
+          </button>
+          <button id="originalOrderBtn" class="btn-sm" title="Revert to original PDF questions 1-50 order">
+            <span>📄</span> Original Order
+          </button>
+        </div>
+      </div>
+
+      <!-- Topic Filter Pills -->
+      <div class="topic-filters" id="topicFilters">
+        <button class="filter-pill active" data-topic="all">All Topics (50)</button>
+        <button class="filter-pill" data-topic="HPC fundamentals">⚡ HPC Fundamentals (10)</button>
+        <button class="filter-pill" data-topic="Memory and parallel design">🧠 Memory & Design (10)</button>
+        <button class="filter-pill" data-topic="MPI">🌐 MPI (10)</button>
+        <button class="filter-pill" data-topic="OpenMP and hybrid programming">🧵 OpenMP & Hybrid (10)</button>
+        <button class="filter-pill" data-topic="MapReduce and distributed storage">🗄️ MapReduce & HDFS (10)</button>
+        <button class="filter-pill" data-topic="starred">⭐ Starred (<span id="starredCount">0</span>)</button>
+      </div>
+    </header>
+
+    <!-- TAB 1: PRACTICE MODE -->
+    <main id="practiceTab" class="tab-content">
+      <div class="practice-container">
+        <!-- Progress Bar -->
+        <div class="progress-bar-container">
+          <div id="practiceProgressFill" class="progress-fill"></div>
+        </div>
+
+        <div class="question-meta">
+          <div class="meta-badges">
+            <span id="practiceCounterBadge" class="badge badge-source">Question 1 / 50</span>
+            <span id="practiceTopicBadge" class="badge badge-topic">HPC fundamentals</span>
+            <span id="practiceOriginalBadge" class="badge badge-source" title="Number in the lecturer's original PDF">Original PDF #1</span>
+          </div>
+          <button id="practiceStarBtn" class="star-btn" title="Bookmark / Star this question">★</button>
+        </div>
+
+        <!-- Question Card -->
+        <div class="card">
+          <div id="practiceQuestionText" class="question-text">Loading question...</div>
+          <div id="practiceOptionsList" class="options-list">
+            <!-- Options dynamically rendered here -->
+          </div>
+
+          <!-- Explanation (Shown after answering) -->
+          <div id="practiceExplanationBox" class="explanation-box hidden">
+            <div class="explanation-title">
+              <span>💡</span> Explanation & Concept:
+            </div>
+            <div id="practiceExplanationText" class="explanation-content"></div>
+          </div>
+        </div>
+
+        <!-- Navigation Buttons -->
+        <div class="nav-actions">
+          <button id="practicePrevBtn" class="btn-nav">← Previous</button>
+          <div class="meta-badges">
+            <button id="practiceRetryBtn" class="btn-sm hidden">Try Again</button>
+          </div>
+          <button id="practiceNextBtn" class="btn-nav">Next →</button>
+        </div>
+
+        <div class="keyboard-hints">
+          Shortcuts: <kbd>1</kbd>–<kbd>5</kbd> Select option &bull; <kbd>←</kbd> <kbd>→</kbd> Navigate &bull; <kbd>S</kbd> Star &bull; <kbd>R</kbd> Reshuffle
+        </div>
+      </div>
+    </main>
+
+    <!-- TAB 2: EXAM SIMULATION MODE -->
+    <section id="examTab" class="tab-content hidden">
+      <!-- Exam Active State -->
+      <div id="examActiveView">
+        <div class="exam-top-bar">
+          <div>
+            <span style="font-size: 0.85rem; color: var(--text-muted); display: block;">Moodle Exam Simulator</span>
+            <span style="font-weight: 700; font-size: 1.05rem;" id="examAnsweredStats">Answered: 0 / 50</span>
+          </div>
+          <div id="examTimer" class="timer-box">⏱️ 45:00</div>
+          <button id="finishExamBtn" class="btn-sm btn-accent">Submit Exam</button>
+        </div>
+
+        <!-- Progress bar -->
+        <div class="progress-bar-container">
+          <div id="examProgressFill" class="progress-fill"></div>
+        </div>
+
+        <!-- Exam Navigator Grid -->
+        <div class="exam-nav-grid" id="examNavGrid">
+          <!-- 1..50 buttons rendered here -->
+        </div>
+
+        <!-- Exam Question Card -->
+        <div class="card" style="margin-top: 1rem;">
+          <div class="question-meta" style="margin-bottom: 1rem;">
+            <div class="meta-badges">
+              <span id="examCounterBadge" class="badge badge-source">Question 1 / 50</span>
+              <span id="examTopicBadge" class="badge badge-topic">Topic</span>
+            </div>
+            <button id="examStarBtn" class="star-btn" title="Flag / Bookmark this question">★</button>
+          </div>
+
+          <div id="examQuestionText" class="question-text">Loading question...</div>
+          <div id="examOptionsList" class="options-list">
+            <!-- Options rendered here -->
+          </div>
+        </div>
+
+        <div class="nav-actions" style="margin-top: 1.25rem;">
+          <button id="examPrevBtn" class="btn-nav">← Previous</button>
+          <button id="examNextBtn" class="btn-nav">Next →</button>
+        </div>
+      </div>
+
+      <!-- Exam Result / Summary State -->
+      <div id="examResultView" class="card score-card hidden">
+        <div class="score-circle">
+          <div id="resultScore" class="score-val">0</div>
+          <div id="resultPercentage" class="score-pct">0%</div>
+        </div>
+        <div id="resultTitle" class="score-title">Exam Completed!</div>
+        <div id="resultMessage" class="score-desc">Review your results below.</div>
+
+        <div class="topic-breakdown" id="topicBreakdown">
+          <!-- Breakdown per topic inserted here -->
+        </div>
+
+        <div style="display: flex; gap: 0.75rem; justify-content: center; flex-wrap: wrap; margin-top: 2rem;">
+          <button id="retakeExamBtn" class="btn-nav btn-accent">🔄 Retake Full Exam</button>
+          <button id="practiceMissedBtn" class="btn-nav">❌ Practice Missed Only</button>
+          <button id="backToPracticeBtn" class="btn-nav">🎯 Return to Practice Mode</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- TAB 3: FLASHCARDS MODE -->
+    <section id="flashcardsTab" class="tab-content hidden">
+      <div class="practice-container">
+        <div class="question-meta">
+          <div class="meta-badges">
+            <span id="flashcardCounterBadge" class="badge badge-source">Card 1 / 50</span>
+            <span id="flashcardTopicBadge" class="badge badge-topic">Topic</span>
+            <span id="flashcardOriginalBadge" class="badge badge-source">Original PDF #1</span>
+          </div>
+        </div>
+
+        <div id="flashcardCard" class="card flashcard">
+          <div id="flashcardFront">
+            <div id="flashcardQuestion" class="question-text" style="margin-bottom: 1rem;">Click to reveal answer</div>
+            <div class="flashcard-hint">👆 Click anywhere to flip & reveal the correct answer</div>
+          </div>
+          <div id="flashcardBack" class="hidden">
+            <div style="font-size: 0.85rem; font-weight: 700; color: var(--success); text-transform: uppercase; margin-bottom: 0.5rem;">
+              ✓ Correct Answer
+            </div>
+            <div id="flashcardAnswer" style="font-size: 1.15rem; font-weight: 700; color: var(--text-primary); margin-bottom: 1rem;"></div>
+            <div id="flashcardExplanation" class="explanation-box"></div>
+          </div>
+        </div>
+
+        <div class="nav-actions">
+          <button id="flashcardPrevBtn" class="btn-nav">← Previous</button>
+          <button id="flashcardFlipBtn" class="btn-sm btn-accent">Flip Card</button>
+          <button id="flashcardNextBtn" class="btn-nav">Next →</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- TAB 4: ALL QUESTIONS LIST & CHEAT SHEET -->
+    <section id="listTab" class="tab-content hidden">
+      <div class="list-search-bar">
+        <input type="text" id="searchInput" class="search-input" placeholder="🔍 Search questions, options, keywords (e.g. MPI_Reduce, FLOP, SIMD, HDFS)...">
+      </div>
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; flex-wrap: wrap; gap: 0.5rem;">
+        <span id="listStatsText" style="font-size: 0.9rem; color: var(--text-secondary);">Showing 50 questions</span>
+        <button id="toggleAllAnswersBtn" class="btn-sm">Show All Answers</button>
+      </div>
+      <div id="questionsListContainer">
+        <!-- Rendered list of questions -->
+      </div>
+    </section>
+  </div>
+
+  <!-- Confirmation Modal -->
+  <div id="confirmModal" class="modal-overlay hidden">
+    <div class="modal-content">
+      <h3 id="modalTitle" class="modal-title">Confirm</h3>
+      <p id="modalBody" class="modal-body">Are you sure?</p>
+      <div class="modal-actions">
+        <button id="modalCancelBtn" class="btn-nav">Cancel</button>
+        <button id="modalConfirmBtn" class="btn-nav btn-accent">Confirm</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Scripts -->
+  <script src="data.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
