@@ -34,7 +34,25 @@
         <div class="notice-icon">📢</div>
         <div>
           <strong>Midterm Quiz Notice:</strong> Friday at 10:30 AM in Moodle (bring your own laptop). 
-          These 50 questions represent ~50% of the midterm exam question pool!
+          Sample questions represents ~50% of the midterm exam pool + lecture and lab concepts!
+        </div>
+      </div>
+
+      <!-- Question Pool Selector (Section Switcher) -->
+      <div class="pool-selector-container">
+        <div class="pool-selector-label">
+          <span>📚</span> Question Pool:
+        </div>
+        <div class="pool-buttons" id="poolSelectorButtons">
+          <button class="pool-btn active" data-pool="official" title="Official sample midterm questions from lecturer">
+            🏛️ Official Sample (50)
+          </button>
+          <button class="pool-btn" data-pool="labs" title="Questions compiled from Weeks 1-4 lecture notes, lab tasks, and reports">
+            🧪 Labs & Weeks 1–4 (40)
+          </button>
+          <button class="pool-btn" data-pool="combined" title="Practice all 90 questions together">
+            🌟 All Combined (90)
+          </button>
         </div>
       </div>
 

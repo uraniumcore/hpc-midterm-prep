@@ -1,5 +1,6 @@
-// HPC Midterm Questions Pool (50 Questions)
-const QUESTIONS_DATA = [
+// High Performance Computing Midterm Prep Data
+
+const OFFICIAL_QUESTIONS = [
   {
     "id": 1,
     "topic": "HPC fundamentals",
@@ -1501,3 +1502,1233 @@ const QUESTIONS_DATA = [
     "explanation": "Once the HDFS client obtains the block locations from the NameNode, it streams the actual raw data blocks directly to and from the respective DataNodes over TCP sockets, preventing the NameNode from becoming a network throughput bottleneck."
   }
 ];
+
+const LABS_QUESTIONS = [
+  {
+    "id": 101,
+    "topic": "Week 1: HPC Fundamentals & Architecture",
+    "question": "Which description correctly distinguishes a processor core, a node, and a cluster in HPC architecture?",
+    "options": [
+      {
+        "id": "A",
+        "text": "A node contains multiple clusters; each cluster contains multiple independent CPU cores"
+      },
+      {
+        "id": "B",
+        "text": "A core is an individual processing unit inside a chip with its own cache; a node is a single computing component with board, chips, and RAM; a cluster connects multiple nodes via a network"
+      },
+      {
+        "id": "C",
+        "text": "A core connects multiple nodes over an interconnect without shared memory"
+      },
+      {
+        "id": "D",
+        "text": "A cluster is a single CPU socket containing multiple operating systems"
+      },
+      {
+        "id": "E",
+        "text": "A node is a software thread running inside L1 cache; a cluster is the main DRAM"
+      }
+    ],
+    "correctOptionId": "B",
+    "correctAnswerText": "A core is an individual processing unit inside a chip with its own cache; a node is a single computing component with board, chips, and RAM; a cluster connects multiple nodes via a network",
+    "explanation": "In HPC hardware taxonomy: A Core is the individual processing unit within a chip executing instructions. A Node is a standalone computer board housing one or more multi-core sockets, shared DRAM, and optional accelerators. A Cluster is the overarching parallel system consisting of multiple networked nodes."
+  },
+  {
+    "id": 102,
+    "topic": "Week 1: HPC Fundamentals & Architecture",
+    "question": "A cluster node contains 2 processor sockets, each socket contains 16 physical cores, and each core supports 2 hardware threads (hyperthreads). How many concurrent hardware threads can execute on this single node?",
+    "options": [
+      {
+        "id": "A",
+        "text": "32"
+      },
+      {
+        "id": "B",
+        "text": "64"
+      },
+      {
+        "id": "C",
+        "text": "16"
+      },
+      {
+        "id": "D",
+        "text": "128"
+      },
+      {
+        "id": "E",
+        "text": "8"
+      }
+    ],
+    "correctOptionId": "B",
+    "correctAnswerText": "64",
+    "explanation": "Total hardware threads = (2 sockets) × (16 physical cores per socket) × (2 hardware threads per core) = 64 concurrent hardware threads."
+  },
+  {
+    "id": 103,
+    "topic": "Week 1: HPC Fundamentals & Architecture",
+    "question": "A scientific code has an inherently serial fraction of 25% (f = 0.25) that cannot be parallelized. According to Amdahl’s Law, what is the maximum theoretical speedup achievable even with an infinite number of processors?",
+    "options": [
+      {
+        "id": "A",
+        "text": "25"
+      },
+      {
+        "id": "B",
+        "text": "10"
+      },
+      {
+        "id": "C",
+        "text": "4"
+      },
+      {
+        "id": "D",
+        "text": "2"
+      },
+      {
+        "id": "E",
+        "text": "Infinite speedup"
+      }
+    ],
+    "correctOptionId": "C",
+    "correctAnswerText": "4",
+    "explanation": "Amdahl's Law states S(P) = 1 / (f + (1 - f)/P). As P -> ∞, the parallel term (1 - f)/P -> 0, leaving S_max = 1 / f = 1 / 0.25 = 4. The sequential bottleneck strictly caps speedup at 4x."
+  },
+  {
+    "id": 104,
+    "topic": "Week 1: HPC Fundamentals & Architecture",
+    "question": "Under the Strong Scaling formulation, what parameter is held strictly constant as the number of processors increases?",
+    "options": [
+      {
+        "id": "A",
+        "text": "The total execution time is kept strictly constant"
+      },
+      {
+        "id": "B",
+        "text": "The total problem size (total workload) is fixed"
+      },
+      {
+        "id": "C",
+        "text": "The workload assigned to each individual processor is kept constant"
+      },
+      {
+        "id": "D",
+        "text": "The DRAM capacity per core is doubled at every scaling step"
+      },
+      {
+        "id": "E",
+        "text": "Network communication latency is assumed to be zero"
+      }
+    ],
+    "correctOptionId": "B",
+    "correctAnswerText": "The total problem size (total workload) is fixed",
+    "explanation": "Strong Scaling benchmarks how fast a fixed total problem size can be solved by adding more processors (governed by Amdahl's Law). Weak Scaling benchmarks solving a proportionally larger problem as processors are added (governed by Gustafson's Law)."
+  },
+  {
+    "id": 105,
+    "topic": "Week 1: HPC Fundamentals & Architecture",
+    "question": "Under Weak Scaling (Gustafson's Law), what occurs as the number of processing cores P increases?",
+    "options": [
+      {
+        "id": "A",
+        "text": "The total problem size is scaled up proportionally with P to maintain a constant workload per processor"
+      },
+      {
+        "id": "B",
+        "text": "The total problem size is kept fixed while execution time drops to zero"
+      },
+      {
+        "id": "C",
+        "text": "Communication overhead is mathematically eliminated"
+      },
+      {
+        "id": "D",
+        "text": "The clock frequency of each core increases linearly with P"
+      },
+      {
+        "id": "E",
+        "text": "The number of arithmetic instructions per core is halved at each step"
+      }
+    ],
+    "correctOptionId": "A",
+    "correctAnswerText": "The total problem size is scaled up proportionally with P to maintain a constant workload per processor",
+    "explanation": "Weak Scaling increases the overall problem size in direct proportion to the number of processors P, aiming to keep the execution time roughly constant while solving much larger problems (higher grid resolution, more particles)."
+  },
+  {
+    "id": 106,
+    "topic": "Week 1: HPC Fundamentals & Architecture",
+    "question": "A processor core performs 4 floating-point operations (FLOPs) per cycle. A node has 32 such cores running at a base clock frequency of 2.5 GHz (2.5 × 10^9 cycles/second). What is the theoretical peak arithmetic throughput of this node?",
+    "options": [
+      {
+        "id": "A",
+        "text": "80 GFLOP/s"
+      },
+      {
+        "id": "B",
+        "text": "200 GFLOP/s"
+      },
+      {
+        "id": "C",
+        "text": "320 GFLOP/s"
+      },
+      {
+        "id": "D",
+        "text": "640 GFLOP/s"
+      },
+      {
+        "id": "E",
+        "text": "128 GFLOP/s"
+      }
+    ],
+    "correctOptionId": "C",
+    "correctAnswerText": "320 GFLOP/s",
+    "explanation": "Peak Throughput = (Cores) × (Clock Frequency) × (FLOPs/cycle) = 32 × (2.5 × 10^9 cycles/s) × 4 FLOPs/cycle = 320 × 10^9 FLOP/s = 320 GFLOP/s."
+  },
+  {
+    "id": 107,
+    "topic": "Week 1: HPC Fundamentals & Architecture",
+    "question": "An application achieves perfect linear speedup (S = P) on P processors. What is its parallel efficiency E?",
+    "options": [
+      {
+        "id": "A",
+        "text": "0%"
+      },
+      {
+        "id": "B",
+        "text": "50%"
+      },
+      {
+        "id": "C",
+        "text": "100% (or 1.0)"
+      },
+      {
+        "id": "D",
+        "text": "P%"
+      },
+      {
+        "id": "E",
+        "text": "1 / P"
+      }
+    ],
+    "correctOptionId": "C",
+    "correctAnswerText": "100% (or 1.0)",
+    "explanation": "Parallel efficiency is defined as E = S / P. When speedup is ideal linear (S = P), efficiency E = P / P = 1.0, or 100% utilization of the computational resources."
+  },
+  {
+    "id": 108,
+    "topic": "Week 1: HPC Fundamentals & Architecture",
+    "question": "Why is 'superlinear speedup' (S > P on P processors) occasionally observed in real-world multicore benchmarks?",
+    "options": [
+      {
+        "id": "A",
+        "text": "Processor cores automatically boost clock frequencies when more threads are active"
+      },
+      {
+        "id": "B",
+        "text": "The aggregated cache capacity of P processors allows the partitioned dataset to fit entirely into fast L2/L3 cache, eliminating slow RAM memory stalls"
+      },
+      {
+        "id": "C",
+        "text": "Amdahl's Law guarantees superlinear curves for matrix operations"
+      },
+      {
+        "id": "D",
+        "text": "Floating-point execution units double their hardware pipelines in parallel mode"
+      },
+      {
+        "id": "E",
+        "text": "Inter-thread communication takes negative time in shared memory"
+      }
+    ],
+    "correctOptionId": "B",
+    "correctAnswerText": "The aggregated cache capacity of P processors allows the partitioned dataset to fit entirely into fast L2/L3 cache, eliminating slow RAM memory stalls",
+    "explanation": "The 'cache effect': on 1 processor, the entire dataset exceeds cache size and spills into slow RAM. When partitioned across P processors, each sub-problem fits into the processor's fast local cache, dramatically reducing memory latency and producing superlinear speedup."
+  },
+  {
+    "id": 109,
+    "topic": "Week 1: HPC Fundamentals & Architecture",
+    "question": "Which of the following is an example of an accelerator commonly paired with host CPUs in modern high-performance computing clusters?",
+    "options": [
+      {
+        "id": "A",
+        "text": "DRAM Memory Controller"
+      },
+      {
+        "id": "B",
+        "text": "GPU (Graphics Processing Unit)"
+      },
+      {
+        "id": "C",
+        "text": "SATA Hard Drive Controller"
+      },
+      {
+        "id": "D",
+        "text": "Motherboard Northbridge chipset"
+      },
+      {
+        "id": "E",
+        "text": "System BIOS ROM"
+      }
+    ],
+    "correctOptionId": "B",
+    "correctAnswerText": "GPU (Graphics Processing Unit)",
+    "explanation": "GPUs (Graphics Processing Units) and specialized TPUs/FPGAs are massively parallel hardware accelerators connected via PCIe/NVLink to accelerate compute-dense matrix and vector calculations alongside general-purpose host CPUs."
+  },
+  {
+    "id": 110,
+    "topic": "Week 1: HPC Fundamentals & Architecture",
+    "question": "A climate simulation takes 100 seconds on 1 core and 25 seconds on 8 cores. What is the parallel efficiency of this 8-core execution?",
+    "options": [
+      {
+        "id": "A",
+        "text": "50%"
+      },
+      {
+        "id": "B",
+        "text": "25%"
+      },
+      {
+        "id": "C",
+        "text": "75%"
+      },
+      {
+        "id": "D",
+        "text": "12.5%"
+      },
+      {
+        "id": "E",
+        "text": "40%"
+      }
+    ],
+    "correctOptionId": "A",
+    "correctAnswerText": "50%",
+    "explanation": "Speedup S = T_sequential / T_parallel = 100s / 25s = 4.0. Parallel Efficiency E = S / P = 4.0 / 8 = 0.50 = 50%."
+  },
+  {
+    "id": 111,
+    "topic": "Week 2: Memory Hierarchy & Parallel Design",
+    "question": "Which of the following correctly orders computer memory levels from fastest (lowest latency) to slowest (highest latency)?",
+    "options": [
+      {
+        "id": "A",
+        "text": "Main Memory (RAM) → L2 Cache → L1 Cache → Registers → Local Disk"
+      },
+      {
+        "id": "B",
+        "text": "Registers → L1 Cache → L2 Cache → Main Memory (RAM) → Local Disk (SSD/HDD)"
+      },
+      {
+        "id": "C",
+        "text": "L1 Cache → Registers → L2 Cache → Local Disk → Main Memory"
+      },
+      {
+        "id": "D",
+        "text": "Registers → Main Memory → L1 Cache → L2 Cache → Local Disk"
+      },
+      {
+        "id": "E",
+        "text": "L2 Cache → L1 Cache → Registers → Local Disk → Main Memory"
+      }
+    ],
+    "correctOptionId": "B",
+    "correctAnswerText": "Registers → L1 Cache → L2 Cache → Main Memory (RAM) → Local Disk (SSD/HDD)",
+    "explanation": "The memory hierarchy from fastest to slowest is: CPU Registers (< 1 cycle) → L1 Cache (few cycles) → L2 Cache (~10-20 cycles) → L3 Cache (~40-60 cycles) → Main Memory DRAM (~100-200 cycles) → Local Storage SSD/HDD (thousands to millions of cycles)."
+  },
+  {
+    "id": 112,
+    "topic": "Week 2: Memory Hierarchy & Parallel Design",
+    "question": "In C and C++, two-dimensional array matrices (e.g., matrix[row][col]) are laid out in contiguous memory using which standard memory ordering?",
+    "options": [
+      {
+        "id": "A",
+        "text": "Column-major order"
+      },
+      {
+        "id": "B",
+        "text": "Diagonal-major order"
+      },
+      {
+        "id": "C",
+        "text": "Row-major order"
+      },
+      {
+        "id": "D",
+        "text": "Block-cyclic distribution"
+      },
+      {
+        "id": "E",
+        "text": "Morton Z-order curve"
+      }
+    ],
+    "correctOptionId": "C",
+    "correctAnswerText": "Row-major order",
+    "explanation": "C and C++ use row-major order: consecutive elements of the same row are stored in adjacent memory addresses (A[i][0], A[i][1], A[i][2]...). In contrast, Fortran and MATLAB use column-major order."
+  },
+  {
+    "id": 113,
+    "topic": "Week 2: Memory Hierarchy & Parallel Design",
+    "question": "In Lab 2, summing a 4000 × 4000 matrix row-wise (`for i, for j: A[i][j]`) took ~0.030s, while column-wise (`for j, for i: A[i][j]`) took ~0.082s (nearly 2.7× slower). What hardware mechanism explains this massive performance difference?",
+    "options": [
+      {
+        "id": "A",
+        "text": "The column-wise version performs 2.7× more arithmetic additions"
+      },
+      {
+        "id": "B",
+        "text": "Row-wise access reads consecutive elements (stride 1) pulling full 64-byte cache lines into L1 cache (spatial locality), while column-wise jumps by 4000 elements on each step, triggering constant cache misses"
+      },
+      {
+        "id": "C",
+        "text": "The column-wise code causes floating-point denormalization penalties"
+      },
+      {
+        "id": "D",
+        "text": "Row-wise loops automatically disable the CPU branch predictor"
+      },
+      {
+        "id": "E",
+        "text": "The compiler refuses to vectorize loops whose outer variable is named j"
+      }
+    ],
+    "correctOptionId": "B",
+    "correctAnswerText": "Row-wise access reads consecutive elements (stride 1) pulling full 64-byte cache lines into L1 cache (spatial locality), while column-wise jumps by 4000 elements on each step, triggering constant cache misses",
+    "explanation": "CPU caches transfer data in 64-byte cache lines (16 ints). In row-wise access, reading A[i][j] loads the next 15 neighboring integers into L1 cache for subsequent iterations. In column-wise access, each step strides by 4000 ints (16,000 bytes), far exceeding the cache line and forcing continuous memory stalls."
+  },
+  {
+    "id": 114,
+    "topic": "Week 2: Memory Hierarchy & Parallel Design",
+    "question": "Standard modern CPU cache lines are 64 bytes wide. How many standard 32-bit (4-byte) integers are fetched simultaneously in a single cache line?",
+    "options": [
+      {
+        "id": "A",
+        "text": "4"
+      },
+      {
+        "id": "B",
+        "text": "8"
+      },
+      {
+        "id": "C",
+        "text": "16"
+      },
+      {
+        "id": "D",
+        "text": "32"
+      },
+      {
+        "id": "E",
+        "text": "64"
+      }
+    ],
+    "correctOptionId": "C",
+    "correctAnswerText": "16",
+    "explanation": "64 bytes per cache line / 4 bytes per 32-bit integer = 16 consecutive integers fetched into cache in a single transfer."
+  },
+  {
+    "id": 115,
+    "topic": "Week 2: Memory Hierarchy & Parallel Design",
+    "question": "What is the key difference between Temporal Locality and Spatial Locality in cache behavior?",
+    "options": [
+      {
+        "id": "A",
+        "text": "Temporal locality refers to accessing adjacent memory addresses; spatial locality refers to accessing memory at high clock frequencies"
+      },
+      {
+        "id": "B",
+        "text": "Temporal locality means accessing the same memory location again in the near future; spatial locality means accessing nearby memory locations soon"
+      },
+      {
+        "id": "C",
+        "text": "Temporal locality applies strictly to SSDs; spatial locality applies strictly to registers"
+      },
+      {
+        "id": "D",
+        "text": "Spatial locality guarantees zero cache misses; temporal locality guarantees zero bus traffic"
+      },
+      {
+        "id": "E",
+        "text": "Temporal locality requires multiple threads; spatial locality is purely single-threaded"
+      }
+    ],
+    "correctOptionId": "B",
+    "correctAnswerText": "Temporal locality means accessing the same memory location again in the near future; spatial locality means accessing nearby memory locations soon",
+    "explanation": "Temporal locality: memory addresses that were accessed recently are likely to be accessed again soon (e.g. accumulator inside a loop). Spatial locality: memory addresses physically close to recent accesses are likely to be accessed soon (e.g. iterating through an array)."
+  },
+  {
+    "id": 116,
+    "topic": "Week 2: Memory Hierarchy & Parallel Design",
+    "question": "What are the four formal design stages in Ian Foster’s PCAM methodology for engineering parallel algorithms?",
+    "options": [
+      {
+        "id": "A",
+        "text": "Pipelining, Compiling, Allocating, Multithreading"
+      },
+      {
+        "id": "B",
+        "text": "Profiling, Caching, Accelerating, Measuring"
+      },
+      {
+        "id": "C",
+        "text": "Partitioning, Communication, Agglomeration, Mapping"
+      },
+      {
+        "id": "D",
+        "text": "Provisioning, Clustering, Assembling, Multiplexing"
+      },
+      {
+        "id": "E",
+        "text": "Processing, Computing, Analyzing, Monitoring"
+      }
+    ],
+    "correctOptionId": "C",
+    "correctAnswerText": "Partitioning, Communication, Agglomeration, Mapping",
+    "explanation": "Foster's design methodology consists of four stages: Partitioning (decomposing into fine-grained tasks) -> Communication (identifying coordination) -> Agglomeration (combining tasks into larger chunks) -> Mapping (assigning tasks to physical processors)."
+  },
+  {
+    "id": 117,
+    "topic": "Week 2: Memory Hierarchy & Parallel Design",
+    "question": "In Foster’s parallel design methodology, what is the primary objective of the 'Partitioning' stage?",
+    "options": [
+      {
+        "id": "A",
+        "text": "Assigning completed tasks to physical CPU cores"
+      },
+      {
+        "id": "B",
+        "text": "Decomposing the data and computation into fine-grained tasks to expose maximum potential concurrency"
+      },
+      {
+        "id": "C",
+        "text": "Combining small tasks into coarse blocks to reduce communication overhead"
+      },
+      {
+        "id": "D",
+        "text": "Compiling C++ code with -O3 optimization flags"
+      },
+      {
+        "id": "E",
+        "text": "Measuring execution time with high-resolution clocks"
+      }
+    ],
+    "correctOptionId": "B",
+    "correctAnswerText": "Decomposing the data and computation into fine-grained tasks to expose maximum potential concurrency",
+    "explanation": "Partitioning is the initial stage where the problem is broken down into the largest possible number of small, fine-grained tasks and data pieces to maximize potential parallelism."
+  },
+  {
+    "id": 118,
+    "topic": "Week 2: Memory Hierarchy & Parallel Design",
+    "question": "If updating each element `A[i][j] = A[i][j] + 1` of a 4000 × 4000 matrix is treated as an individual task, 16,000,000 tasks are created. Why must these fine-grained tasks undergo Agglomeration before execution?",
+    "options": [
+      {
+        "id": "A",
+        "text": "The computer will run out of arithmetic precision"
+      },
+      {
+        "id": "B",
+        "text": "The immense overhead of creating, scheduling, and synchronizing millions of micro-tasks would far exceed the actual addition computation"
+      },
+      {
+        "id": "C",
+        "text": "The matrix would automatically be converted into a column-major format"
+      },
+      {
+        "id": "D",
+        "text": "Modern operating systems cannot allocate more than 1,000 memory bytes"
+      },
+      {
+        "id": "E",
+        "text": "Individual element updates violate C++ language grammar rules"
+      }
+    ],
+    "correctOptionId": "B",
+    "correctAnswerText": "The immense overhead of creating, scheduling, and synchronizing millions of micro-tasks would far exceed the actual addition computation",
+    "explanation": "Spawning and scheduling 16 million individual micro-tasks causes massive parallel runtime overhead. Agglomerating tasks into 4 coarse chunks (1,000 rows each) dramatically reduces scheduling overhead and preserves cache locality."
+  },
+  {
+    "id": 119,
+    "topic": "Week 2: Memory Hierarchy & Parallel Design",
+    "question": "Dividing the rows of a 4000 × 4000 matrix equally among 4 processors (rows 0–999 to P0, 1000–1999 to P1, etc.) where each processor executes the identical update code is an example of:",
+    "options": [
+      {
+        "id": "A",
+        "text": "Functional decomposition"
+      },
+      {
+        "id": "B",
+        "text": "Domain decomposition (data partitioning)"
+      },
+      {
+        "id": "C",
+        "text": "Instruction-level pipelining"
+      },
+      {
+        "id": "D",
+        "text": "Hardware hyperthreading"
+      },
+      {
+        "id": "E",
+        "text": "Dynamic work stealing"
+      }
+    ],
+    "correctOptionId": "B",
+    "correctAnswerText": "Domain decomposition (data partitioning)",
+    "explanation": "Domain decomposition (data parallelism) divides the primary data structure (the matrix domain) across processors, while each processor executes the same computational operations on its assigned subdomain."
+  },
+  {
+    "id": 120,
+    "topic": "Week 2: Memory Hierarchy & Parallel Design",
+    "question": "During the Mapping phase, what performance issue occurs if Processor 0 is assigned 3,000 rows while Processors 1, 2, and 3 are assigned only 333 rows each?",
+    "options": [
+      {
+        "id": "A",
+        "text": "Superlinear speedup across all cores"
+      },
+      {
+        "id": "B",
+        "text": "Hardware deadlock across all PCIe buses"
+      },
+      {
+        "id": "C",
+        "text": "Severe load imbalance (the straggler effect), where P0 takes ~9× longer and the idle processors waste CPU cycles waiting for P0"
+      },
+      {
+        "id": "D",
+        "text": "Processor 0 automatically doubles its clock multiplier"
+      },
+      {
+        "id": "E",
+        "text": "The cache memory of P1, P2, and P3 is wiped"
+      }
+    ],
+    "correctOptionId": "C",
+    "correctAnswerText": "Severe load imbalance (the straggler effect), where P0 takes ~9× longer and the idle processors waste CPU cycles waiting for P0",
+    "explanation": "Severe load imbalance: the total parallel execution time is governed by the slowest worker (straggler). Processors 1–3 finish quickly and sit idle, bottlenecking the entire application's wall-clock speed."
+  },
+  {
+    "id": 121,
+    "topic": "Week 3: Parallel Design & Monte Carlo",
+    "question": "In a Monte Carlo estimation of π inside a 2 × 2 square containing an inscribed circle of radius r = 1, N points are generated uniformly in [-1, 1]. If M points fall inside the circle (x² + y² ≤ 1), how is π computed?",
+    "options": [
+      {
+        "id": "A",
+        "text": "π ≈ M / N"
+      },
+      {
+        "id": "B",
+        "text": "π ≈ 4 × (M / N)"
+      },
+      {
+        "id": "C",
+        "text": "π ≈ 2 × (M / N)"
+      },
+      {
+        "id": "D",
+        "text": "π ≈ (N / M) / 4"
+      },
+      {
+        "id": "E",
+        "text": "π ≈ √(M / N)"
+      }
+    ],
+    "correctOptionId": "B",
+    "correctAnswerText": "π ≈ 4 × (M / N)",
+    "explanation": "Area of inscribed circle = π·r² = π(1)² = π. Area of square = 2 × 2 = 4. The ratio of inside points to total points approaches the area ratio: M / N ≈ π / 4. Therefore, π ≈ 4 × (M / N)."
+  },
+  {
+    "id": 122,
+    "topic": "Week 3: Parallel Design & Monte Carlo",
+    "question": "In the Monte Carlo simulation of π, why does a memory-efficient program NOT need to store all N generated (x, y) coordinates?",
+    "options": [
+      {
+        "id": "A",
+        "text": "Coordinates are automatically swapped to disk storage by the operating system"
+      },
+      {
+        "id": "B",
+        "text": "Each point (x, y) is evaluated immediately upon generation to check x² + y² ≤ 1, and only a single running integer counter M of inside points needs to be maintained"
+      },
+      {
+        "id": "C",
+        "text": "The C++ compiler deletes variables after each iteration automatically"
+      },
+      {
+        "id": "D",
+        "text": "Circle evaluations only work with negative coordinates"
+      },
+      {
+        "id": "E",
+        "text": "RAM cannot hold floating-point coordinates"
+      }
+    ],
+    "correctOptionId": "B",
+    "correctAnswerText": "Each point (x, y) is evaluated immediately upon generation to check x² + y² ≤ 1, and only a single running integer counter M of inside points needs to be maintained",
+    "explanation": "Stream processing: each coordinate pair (x, y) is tested instantly against x² + y² ≤ 1 and discarded. Storing millions of points in memory is completely unnecessary and wastes RAM."
+  },
+  {
+    "id": 123,
+    "topic": "Week 3: Parallel Design & Monte Carlo",
+    "question": "Why is Monte Carlo point generation and testing classified as an 'Embarrassingly Parallel' computational problem?",
+    "options": [
+      {
+        "id": "A",
+        "text": "Each point calculation requires reading the coordinates of the previous 10 points"
+      },
+      {
+        "id": "B",
+        "text": "Each random point evaluation is 100% independent of any other point, requiring zero communication between workers during generation"
+      },
+      {
+        "id": "C",
+        "text": "It requires frequent MPI barrier synchronizations between random draws"
+      },
+      {
+        "id": "D",
+        "text": "The algorithm can only run on a single processor core"
+      },
+      {
+        "id": "E",
+        "text": "The approximation error causes CPU hardware exceptions"
+      }
+    ],
+    "correctOptionId": "B",
+    "correctAnswerText": "Each random point evaluation is 100% independent of any other point, requiring zero communication between workers during generation",
+    "explanation": "Embarrassingly (or pleasantly) parallel problems have tasks that require no communication or synchronization between workers during execution. Each processor generates points and counts valid hits entirely independently."
+  },
+  {
+    "id": 124,
+    "topic": "Week 3: Parallel Design & Monte Carlo",
+    "question": "When parallelizing a Monte Carlo simulation across multiple threads or processes, what critical requirement applies to the pseudo-random number generator (PRNG)?",
+    "options": [
+      {
+        "id": "A",
+        "text": "All threads must be initialized with the exact same seed to ensure deterministic output"
+      },
+      {
+        "id": "B",
+        "text": "Each thread must be initialized with an independent, distinct seed (or disjoint random stream) to avoid generating duplicate random sequences and wasting computation"
+      },
+      {
+        "id": "C",
+        "text": "Random numbers can only be generated by the master thread and broadcasted"
+      },
+      {
+        "id": "D",
+        "text": "PRNG functions are illegal inside parallel loops in C++"
+      },
+      {
+        "id": "E",
+        "text": "Threads must share a single un-synchronized PRNG state pointer"
+      }
+    ],
+    "correctOptionId": "B",
+    "correctAnswerText": "Each thread must be initialized with an independent, distinct seed (or disjoint random stream) to avoid generating duplicate random sequences and wasting computation",
+    "explanation": "If parallel threads share the same random seed, they will generate identical sequences of random numbers, duplicating calculations and invalidating the statistical independence of the simulation."
+  },
+  {
+    "id": 125,
+    "topic": "Week 3: Parallel Design & Monte Carlo",
+    "question": "In Lab 3, four processors generate 250,000 points each and compute local counts M0, M1, M2, and M3. What parallel pattern is used to compute the final count M = M0 + M1 + M2 + M3?",
+    "options": [
+      {
+        "id": "A",
+        "text": "Broadcast from processor 0 to all workers"
+      },
+      {
+        "id": "B",
+        "text": "Parallel reduction (global sum aggregation)"
+      },
+      {
+        "id": "C",
+        "text": "Matrix transposition"
+      },
+      {
+        "id": "D",
+        "text": "Parallel bitonic sorting"
+      },
+      {
+        "id": "E",
+        "text": "Scatter from root"
+      }
+    ],
+    "correctOptionId": "B",
+    "correctAnswerText": "Parallel reduction (global sum aggregation)",
+    "explanation": "A parallel reduction aggregates partial contributions from multiple workers using an associative/commutative binary operator (such as addition) into a single collective result."
+  },
+  {
+    "id": 126,
+    "topic": "Week 3: Parallel Design & Monte Carlo",
+    "question": "In Lab 3, when total points N increased from 10^3 to 10^6, the approximation of π improved from 3.152 to 3.142428. Which statistical law describes this convergence behavior?",
+    "options": [
+      {
+        "id": "A",
+        "text": "Moore's Law"
+      },
+      {
+        "id": "B",
+        "text": "The Law of Large Numbers"
+      },
+      {
+        "id": "C",
+        "text": "Amdahl's Law"
+      },
+      {
+        "id": "D",
+        "text": "Little's Law"
+      },
+      {
+        "id": "E",
+        "text": "Gustafson's Law"
+      }
+    ],
+    "correctOptionId": "B",
+    "correctAnswerText": "The Law of Large Numbers",
+    "explanation": "The Law of Large Numbers states that as the number of independent random trials N increases, the sample average converges toward the true expected theoretical value (error scales as O(1/√N))."
+  },
+  {
+    "id": 127,
+    "topic": "Week 3: Parallel Design & Monte Carlo",
+    "question": "Which of the following represents an example of Functional Decomposition rather than Domain Decomposition?",
+    "options": [
+      {
+        "id": "A",
+        "text": "Dividing 1,000,000 Monte Carlo points into 4 blocks of 250,000 points"
+      },
+      {
+        "id": "B",
+        "text": "In a simulation system, assigning climate physics calculation to Node 1, data logging to Node 2, and real-time 3D rendering to Node 3"
+      },
+      {
+        "id": "C",
+        "text": "Partitioning a 4000 × 4000 matrix into 1000 rows per processor"
+      },
+      {
+        "id": "D",
+        "text": "Dividing a fluid dynamics spatial grid into 8 sub-cubes"
+      },
+      {
+        "id": "E",
+        "text": "Splitting an array of 10,000,000 doubles across 4 OpenMP threads"
+      }
+    ],
+    "correctOptionId": "B",
+    "correctAnswerText": "In a simulation system, assigning climate physics calculation to Node 1, data logging to Node 2, and real-time 3D rendering to Node 3",
+    "explanation": "Functional decomposition partitions the software by distinct tasks/functions (physics, logging, rendering), whereas domain decomposition partitions the data structure (points, grid, matrix) among workers running the same code."
+  },
+  {
+    "id": 128,
+    "topic": "Week 3: Parallel Design & Monte Carlo",
+    "question": "In Ian Foster’s methodology applied to Monte Carlo on 4 processors, why is assigning 1 coarse task of 250,000 points per processor better than creating 1,000,000 fine-grained tasks of 1 point each?",
+    "options": [
+      {
+        "id": "A",
+        "text": "Fine-grained tasks produce incorrect random numbers"
+      },
+      {
+        "id": "B",
+        "text": "Assigning coarse tasks matches hardware cores, eliminates thread scheduling/context-switching overhead, and maximizes local cache efficiency"
+      },
+      {
+        "id": "C",
+        "text": "Processors cannot perform arithmetic unless tasks contain more than 10,000 iterations"
+      },
+      {
+        "id": "D",
+        "text": "Coarse tasks eliminate the need for floating-point calculations"
+      },
+      {
+        "id": "E",
+        "text": "Operating systems restrict programs to at most 10 function calls"
+      }
+    ],
+    "correctOptionId": "B",
+    "correctAnswerText": "Assigning coarse tasks matches hardware cores, eliminates thread scheduling/context-switching overhead, and maximizes local cache efficiency",
+    "explanation": "Creating millions of micro-tasks creates huge thread creation, dispatching, and synchronization overhead. Agglomerating work into coarse tasks matching available cores achieves near-zero scheduling overhead."
+  },
+  {
+    "id": 129,
+    "topic": "Week 3: Parallel Design & Monte Carlo",
+    "question": "In a tree-based parallel reduction across P = 8 processors, how many communication steps are required to aggregate the partial results?",
+    "options": [
+      {
+        "id": "A",
+        "text": "8 steps"
+      },
+      {
+        "id": "B",
+        "text": "64 steps"
+      },
+      {
+        "id": "C",
+        "text": "3 steps (log2 8)"
+      },
+      {
+        "id": "D",
+        "text": "1 step"
+      },
+      {
+        "id": "E",
+        "text": "16 steps"
+      }
+    ],
+    "correctOptionId": "C",
+    "correctAnswerText": "3 steps (log2 8)",
+    "explanation": "Binary tree reduction pairs up processors at each step (8 -> 4 -> 2 -> 1), completing in ceil(log2 P) = log2 8 = 3 steps, rather than P-1 = 7 linear steps."
+  },
+  {
+    "id": 130,
+    "topic": "Week 3: Parallel Design & Monte Carlo",
+    "question": "If a sequential Monte Carlo code runs in 8.0 seconds and a parallel version on 4 cores runs in 2.2 seconds, what is the speedup S and parallel efficiency E?",
+    "options": [
+      {
+        "id": "A",
+        "text": "Speedup ≈ 3.64, Efficiency ≈ 91%"
+      },
+      {
+        "id": "B",
+        "text": "Speedup ≈ 0.28, Efficiency ≈ 28%"
+      },
+      {
+        "id": "C",
+        "text": "Speedup = 4.0, Efficiency = 100%"
+      },
+      {
+        "id": "D",
+        "text": "Speedup = 1.8, Efficiency ≈ 45%"
+      },
+      {
+        "id": "E",
+        "text": "Speedup = 2.2, Efficiency ≈ 55%"
+      }
+    ],
+    "correctOptionId": "A",
+    "correctAnswerText": "Speedup ≈ 3.64, Efficiency ≈ 91%",
+    "explanation": "Speedup S = T1 / Tp = 8.0s / 2.2s ≈ 3.636. Parallel Efficiency E = S / P = 3.636 / 4 ≈ 0.909 = 90.9% (or ~91%)."
+  },
+  {
+    "id": 131,
+    "topic": "Week 4: OpenMP Programming & Multi-threading",
+    "question": "What is the primary execution model governing OpenMP multithreading?",
+    "options": [
+      {
+        "id": "A",
+        "text": "Distributed actor model with remote message passing"
+      },
+      {
+        "id": "B",
+        "text": "Fork-Join model: an initial master thread forks a team of threads at `#pragma omp parallel`, synchronizes at the end, and joins back"
+      },
+      {
+        "id": "C",
+        "text": "Single Instruction Multiple Data (SIMD) hardware vector execution only"
+      },
+      {
+        "id": "D",
+        "text": "Client-server TCP socket polling"
+      },
+      {
+        "id": "E",
+        "text": "Event-driven asynchronous JavaScript promises"
+      }
+    ],
+    "correctOptionId": "B",
+    "correctAnswerText": "Fork-Join model: an initial master thread forks a team of threads at `#pragma omp parallel`, synchronizes at the end, and joins back",
+    "explanation": "OpenMP is based on the Fork-Join model: a program begins with a single initial thread. When a `#pragma omp parallel` directive is encountered, the master thread forks a team of worker threads. At the end of the parallel construct, threads synchronize at an implicit barrier and join back to the master."
+  },
+  {
+    "id": 132,
+    "topic": "Week 4: OpenMP Programming & Multi-threading",
+    "question": "Which compiler flag must be passed to the GNU C++ compiler (`g++`) to enable OpenMP compilation and directives?",
+    "options": [
+      {
+        "id": "A",
+        "text": "-openmp-all"
+      },
+      {
+        "id": "B",
+        "text": "-parallelize"
+      },
+      {
+        "id": "C",
+        "text": "-fopenmp"
+      },
+      {
+        "id": "D",
+        "text": "-mp-threads"
+      },
+      {
+        "id": "E",
+        "text": "-O3-omp"
+      }
+    ],
+    "correctOptionId": "C",
+    "correctAnswerText": "-fopenmp",
+    "explanation": "In GCC and Clang, the flag `-fopenmp` instructs the compiler to parse `#pragma omp` directives, link OpenMP runtime libraries, and generate multi-threaded code."
+  },
+  {
+    "id": 133,
+    "topic": "Week 4: OpenMP Programming & Multi-threading",
+    "question": "In an OpenMP parallel region configured with 4 threads (`omp_set_num_threads(4)`), what integer values are returned by `omp_get_thread_num()` across the team?",
+    "options": [
+      {
+        "id": "A",
+        "text": "1, 2, 3, 4"
+      },
+      {
+        "id": "B",
+        "text": "0, 1, 2, 3"
+      },
+      {
+        "id": "C",
+        "text": "-1, 0, 1, 2"
+      },
+      {
+        "id": "D",
+        "text": "Operating system PIDs"
+      },
+      {
+        "id": "E",
+        "text": "4 for all threads"
+      }
+    ],
+    "correctOptionId": "B",
+    "correctAnswerText": "0, 1, 2, 3",
+    "explanation": "In OpenMP, `omp_get_thread_num()` returns a 0-based unique identifier for each thread in the team: thread IDs range from 0 to num_threads - 1 (0, 1, 2, 3)."
+  },
+  {
+    "id": 134,
+    "topic": "Week 4: OpenMP Programming & Multi-threading",
+    "question": "Consider the OpenMP loop `#pragma omp parallel for for(int i = 0; i < N; ++i)`. What is the default data scoping of the loop counter variable `i`?",
+    "options": [
+      {
+        "id": "A",
+        "text": "It is shared among all threads, creating race conditions unless protected by critical sections"
+      },
+      {
+        "id": "B",
+        "text": "It is private to each thread by default according to the OpenMP specification"
+      },
+      {
+        "id": "C",
+        "text": "It is allocated in global shared memory on the heap"
+      },
+      {
+        "id": "D",
+        "text": "It must be explicitly declared `firstprivate(i)` or the code fails to compile"
+      },
+      {
+        "id": "E",
+        "text": "It is accessible only by thread 0"
+      }
+    ],
+    "correctOptionId": "B",
+    "correctAnswerText": "It is private to each thread by default according to the OpenMP specification",
+    "explanation": "In OpenMP work-sharing loops (`omp for`), the loop iteration counter variable is made private to each thread by default so that each thread can independently iterate through its assigned subset without interference."
+  },
+  {
+    "id": 135,
+    "topic": "Week 4: OpenMP Programming & Multi-threading",
+    "question": "In Lab 4 Part 5, several threads execute `counter++` on a shared integer without synchronization. Why does this cause a race condition and lost updates?",
+    "options": [
+      {
+        "id": "A",
+        "text": "The variable `counter++` is executed in reverse order by thread 0"
+      },
+      {
+        "id": "B",
+        "text": "At machine level, `counter++` consists of 3 distinct instructions (load, increment, store); interleaved execution across CPU cores causes updates to be overwritten"
+      },
+      {
+        "id": "C",
+        "text": "The compiler replaces `counter++` with a decrement operation when multithreading"
+      },
+      {
+        "id": "D",
+        "text": "OpenMP resets shared variables to 0 every 100 iterations"
+      },
+      {
+        "id": "E",
+        "text": "The ALU hardware can only increment one variable per microsecond"
+      }
+    ],
+    "correctOptionId": "B",
+    "correctAnswerText": "At machine level, `counter++` consists of 3 distinct instructions (load, increment, store); interleaved execution across CPU cores causes updates to be overwritten",
+    "explanation": "An increment operation is a non-atomic read-modify-write cycle: (1) Load counter from memory into register, (2) Increment register by 1, (3) Store register back to memory. If Thread B reads counter before Thread A writes back its increment, Thread A's update is lost."
+  },
+  {
+    "id": 136,
+    "topic": "Week 4: OpenMP Programming & Multi-threading",
+    "question": "What is the primary performance difference between protecting a counter with `#pragma omp critical` versus `#pragma omp atomic`?",
+    "options": [
+      {
+        "id": "A",
+        "text": "`critical` is faster because it uses software mutex locks"
+      },
+      {
+        "id": "B",
+        "text": "`atomic` leverages hardware-supported atomic memory instructions (e.g., LOCK INC or atomic add) for single memory locations, having significantly lower overhead than a general `critical` section lock"
+      },
+      {
+        "id": "C",
+        "text": "`atomic` can protect arbitrary blocks of 100 statements, while `critical` only protects one line"
+      },
+      {
+        "id": "D",
+        "text": "`critical` disables thread execution, while `atomic` creates extra helper threads"
+      },
+      {
+        "id": "E",
+        "text": "There is no difference; they generate the exact same machine code"
+      }
+    ],
+    "correctOptionId": "B",
+    "correctAnswerText": "`atomic` leverages hardware-supported atomic memory instructions (e.g., LOCK INC or atomic add) for single memory locations, having significantly lower overhead than a general `critical` section lock",
+    "explanation": "`#pragma omp atomic` delegates the update directly to CPU hardware atomic instructions (like LOCK CMPXCHG or ARM atomic load-add), avoiding the heavy software lock/mutex and context overhead of `#pragma omp critical`."
+  },
+  {
+    "id": 137,
+    "topic": "Week 4: OpenMP Programming & Multi-threading",
+    "question": "When using the OpenMP reduction clause `#pragma omp parallel for reduction(+:sum)`, what initial value does OpenMP automatically assign to each thread's private accumulator?",
+    "options": [
+      {
+        "id": "A",
+        "text": "The initial global value of `sum` before entering the parallel region"
+      },
+      {
+        "id": "B",
+        "text": "The mathematical identity element of the reduction operator, which is 0 (or 0.0 for addition)"
+      },
+      {
+        "id": "C",
+        "text": "A random uninitialized memory value"
+      },
+      {
+        "id": "D",
+        "text": "1.0"
+      },
+      {
+        "id": "E",
+        "text": "The thread's private ID from `omp_get_thread_num()`"
+      }
+    ],
+    "correctOptionId": "B",
+    "correctAnswerText": "The mathematical identity element of the reduction operator, which is 0 (or 0.0 for addition)",
+    "explanation": "OpenMP initializes private reduction accumulators with the operator's mathematical identity element: 0 for addition `+`, 1 for multiplication `*`, maximum value for `min`, minimum value for `max`."
+  },
+  {
+    "id": 138,
+    "topic": "Week 4: OpenMP Programming & Multi-threading",
+    "question": "In Lab 4 Part 6, loop iterations required uneven computational work (work = 100 + (i mod 1000)). Why was `schedule(dynamic, 10)` ~19% faster than `schedule(static)`?",
+    "options": [
+      {
+        "id": "A",
+        "text": "Static scheduling disables vectorization on all cores"
+      },
+      {
+        "id": "B",
+        "text": "Dynamic scheduling provides automatic load balancing: threads that finish lighter chunks immediately claim new work from the queue, preventing cores from sitting idle"
+      },
+      {
+        "id": "C",
+        "text": "Dynamic scheduling performs fewer loop iterations than static scheduling"
+      },
+      {
+        "id": "D",
+        "text": "Dynamic scheduling runs iterations in reverse order at double clock speed"
+      },
+      {
+        "id": "E",
+        "text": "Static scheduling requires inter-node network messages"
+      }
+    ],
+    "correctOptionId": "B",
+    "correctAnswerText": "Dynamic scheduling provides automatic load balancing: threads that finish lighter chunks immediately claim new work from the queue, preventing cores from sitting idle",
+    "explanation": "Under static scheduling with non-uniform workloads, threads assigned heavy iterations become bottlenecks while others sit idle. Dynamic scheduling dispenses chunks of work at runtime on-demand, achieving superior load balance."
+  },
+  {
+    "id": 139,
+    "topic": "Week 4: OpenMP Programming & Multi-threading",
+    "question": "What is 'False Sharing' in OpenMP shared-memory programming, and why does it degrade performance?",
+    "options": [
+      {
+        "id": "A",
+        "text": "Different threads writing to independent variables that reside within the same 64-byte cache line, causing constant cache invalidation and ping-ponging between CPU cores"
+      },
+      {
+        "id": "B",
+        "text": "Two threads accessing variables that share the same identifier name in different source files"
+      },
+      {
+        "id": "C",
+        "text": "Running OpenMP code on hardware that lacks a dedicated GPU accelerator"
+      },
+      {
+        "id": "D",
+        "text": "Setting `OMP_NUM_THREADS` higher than the number of available cores"
+      },
+      {
+        "id": "E",
+        "text": "Passing pointers between functions without const qualifiers"
+      }
+    ],
+    "correctOptionId": "A",
+    "correctAnswerText": "Different threads writing to independent variables that reside within the same 64-byte cache line, causing constant cache invalidation and ping-ponging between CPU cores",
+    "explanation": "False sharing occurs when independent variables accessed by different CPU cores reside on the same 64-byte cache line. Modifying one variable forces the cache coherence protocol (MESI) to invalidate the entire cache line on other cores, creating heavy bus traffic."
+  },
+  {
+    "id": 140,
+    "topic": "Week 4: OpenMP Programming & Multi-threading",
+    "question": "Which OpenMP API function returns the elapsed wall-clock time in seconds as a double, standardly used to benchmark parallel execution runtime in Lab 4?",
+    "options": [
+      {
+        "id": "A",
+        "text": "omp_get_clock_ticks()"
+      },
+      {
+        "id": "B",
+        "text": "omp_get_wtime()"
+      },
+      {
+        "id": "C",
+        "text": "omp_time_now()"
+      },
+      {
+        "id": "D",
+        "text": "omp_timer_seconds()"
+      },
+      {
+        "id": "E",
+        "text": "omp_wall_clock()"
+      }
+    ],
+    "correctOptionId": "B",
+    "correctAnswerText": "omp_get_wtime()",
+    "explanation": "`double omp_get_wtime()` returns elapsed wall-clock time in seconds from an arbitrary reference point in the past. Benchmarking code measures `double start = omp_get_wtime(); ... double elapsed = omp_get_wtime() - start;`."
+  }
+];
+
+const QUESTION_POOLS = {
+  official: {
+    id: 'official',
+    name: '🏛️ Official Sample Pool (50 вопросов)',
+    badge: 'Official PDF',
+    description: 'Официальные вопросы от лектора (около 50% вопросов из пула экзамена)',
+    questions: OFFICIAL_QUESTIONS
+  },
+  labs: {
+    id: 'labs',
+    name: '🧪 Labs & Weeks 1–4 Pool (40 вопросов)',
+    badge: 'Weeks 1–4 Labs',
+    description: 'Вопросы по темам 1-й, 2-й, 3-й и 4-й недель курса и лабораторных работ (HPC Arch, Cache, Monte Carlo, OpenMP)',
+    questions: LABS_QUESTIONS
+  },
+  combined: {
+    id: 'combined',
+    name: '🌟 Все вопросы вместе (90 вопросов)',
+    badge: 'Full Marathon (90)',
+    description: 'Объединенный банк: 50 официальных вопросов + 40 вопросов по лабораторным',
+    questions: [...OFFICIAL_QUESTIONS, ...LABS_QUESTIONS]
+  }
+};
+
+// Default fallback export
+const QUESTIONS_DATA = OFFICIAL_QUESTIONS;

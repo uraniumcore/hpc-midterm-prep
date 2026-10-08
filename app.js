@@ -1,11 +1,13 @@
 // HPC Midterm Prep Application
-// Features: Dynamic question/option shuffling, Practice mode, Exam simulator, Flashcards, Searchable list
+// Features: Dynamic Pools (Official Sample vs Labs Weeks 1-4 vs Combined),
+// Question/Option Shuffling, Practice Mode, Exam Simulator, Flashcards, Searchable List
 
 (function() {
   'use strict';
 
   // --- STATE ---
   const state = {
+    activePool: 'official', // 'official' | 'labs' | 'combined'
     allQuestions: [],
     questions: [],
     currentPracticeIndex: 0,
@@ -19,7 +21,7 @@
     practiceAnswers: {}, // { [questionId]: { selectedText: string, isCorrect: boolean } }
     examAnswers: {}, // { [questionId]: selectedText }
     examActive: false,
-    examTimeRemaining: 45 * 60, // 45 minutes
+    examTimeRemaining: 45 * 60,
     examTimerId: null,
     examSubmitted: false,
     soundEnabled: true,
@@ -100,13 +102,11 @@
     return arr;
   }
 
-  // Prepares a question for display: copies options and conditionally shuffles them
   function prepareQuestionOptions(q, shuffleOpts) {
     let options = q.options.map(opt => ({ ...opt }));
     if (shuffleOpts) {
       options = fisherYatesShuffle(options);
     }
-    // Re-assign display letters A, B, C, D, E based on current position
     const letters = ['A', 'B', 'C', 'D', 'E'];
     return options.map((opt, idx) => ({
       ...opt,
@@ -114,7 +114,17 @@
     }));
   }
 
-  // Load from local storage
+  // Question origin badge helper
+  function getOriginBadgeText(q) {
+    if (q.id <= 50) {
+      return `Official PDF #${q.id}`;
+    }
+    const weekNum = Math.floor((q.id - 101) / 10) + 1;
+    const taskNum = ((q.id - 101) % 10) + 1;
+    return `Week ${weekNum} Lab #${taskNum}`;
+  }
+
+  // Local storage management
   function loadPersistedState() {
     try {
       const savedStarred = localStorage.getItem('hpc_starred');
@@ -134,6 +144,10 @@
       if (savedAnswers) {
         state.practiceAnswers = JSON.parse(savedAnswers);
       }
+      const savedPool = localStorage.getItem('hpc_active_pool');
+      if (savedPool && ['official', 'labs', 'combined'].includes(savedPool)) {
+        state.activePool = savedPool;
+      }
     } catch (e) {
       console.warn('Could not read localStorage', e);
     }
@@ -145,30 +159,130 @@
       localStorage.setItem('hpc_theme', state.theme);
       localStorage.setItem('hpc_sound', String(state.soundEnabled));
       localStorage.setItem('hpc_practice_answers', JSON.stringify(state.practiceAnswers));
+      localStorage.setItem('hpc_active_pool', state.activePool);
     } catch (e) {
       console.warn('Could not save to localStorage', e);
     }
   }
 
-  // --- INITIALIZATION ---
-  function initData() {
-    if (typeof QUESTIONS_DATA !== 'undefined' && Array.isArray(QUESTIONS_DATA)) {
-      state.allQuestions = QUESTIONS_DATA.map(q => ({
-        ...q,
-        // Cache display options so shuffled order stays stable during navigation until reshuffle
-        currentOptions: prepareQuestionOptions(q, state.shuffleOptions)
-      }));
-    } else {
-      console.error('QUESTIONS_DATA not loaded!');
-      return;
+  // --- POOL & DATA INITIALIZATION ---
+  function getRawQuestionsForActivePool() {
+    if (typeof QUESTION_POOLS !== 'undefined' && QUESTION_POOLS[state.activePool]) {
+      return QUESTION_POOLS[state.activePool].questions;
     }
+    if (typeof QUESTIONS_DATA !== 'undefined' && Array.isArray(QUESTIONS_DATA)) {
+      return QUESTIONS_DATA;
+    }
+    return [];
+  }
 
+  function switchPool(poolKey) {
+    if (!['official', 'labs', 'combined'].includes(poolKey)) return;
+    playSound('click');
+    state.activePool = poolKey;
+    state.activeTopic = 'all';
+    savePersistedState();
+
+    // Update active class on pool buttons
+    document.querySelectorAll('#poolSelectorButtons .pool-btn').forEach(btn => {
+      btn.classList.toggle('active', btn.dataset.pool === poolKey);
+    });
+
+    initData();
+  }
+
+  function initData() {
+    const raw = getRawQuestionsForActivePool();
+    state.allQuestions = raw.map(q => ({
+      ...q,
+      currentOptions: prepareQuestionOptions(q, state.shuffleOptions)
+    }));
+
+    renderTopicFilters();
     applyFilteringAndShuffling();
     updateStarredCount();
     updateThemeUI();
     updateSoundUI();
-    renderCurrentPracticeQuestion();
-    renderExamGrid();
+
+    if (state.activeTab === 'practice') {
+      renderCurrentPracticeQuestion();
+    } else if (state.activeTab === 'exam') {
+      initExam();
+    } else if (state.activeTab === 'flashcards') {
+      renderCurrentFlashcard();
+    } else if (state.activeTab === 'list') {
+      renderQuestionsList();
+    }
+  }
+
+  // --- DYNAMIC TOPIC FILTERS RENDERING ---
+  function renderTopicFilters() {
+    const container = document.getElementById('topicFilters');
+    if (!container) return;
+
+    // Extract all unique topics and counts from state.allQuestions
+    const topicCounts = {};
+    state.allQuestions.forEach(q => {
+      topicCounts[q.topic] = (topicCounts[q.topic] || 0) + 1;
+    });
+
+    container.innerHTML = '';
+
+    // "All Topics" Pill
+    const allBtn = document.createElement('button');
+    allBtn.className = `filter-pill ${state.activeTopic === 'all' ? 'active' : ''}`;
+    allBtn.dataset.topic = 'all';
+    allBtn.textContent = `All Topics (${state.allQuestions.length})`;
+    allBtn.addEventListener('click', () => handleTopicSelect('all'));
+    container.appendChild(allBtn);
+
+    // Topic specific pills
+    for (const [topic, count] of Object.entries(topicCounts)) {
+      const pill = document.createElement('button');
+      pill.className = `filter-pill ${state.activeTopic === topic ? 'active' : ''}`;
+      pill.dataset.topic = topic;
+
+      // Icon prefix helper
+      let prefix = '📌 ';
+      if (topic.includes('HPC') || topic.includes('Fundamentals')) prefix = '⚡ ';
+      else if (topic.includes('Memory') || topic.includes('Cache')) prefix = '🧠 ';
+      else if (topic.includes('MPI')) prefix = '🌐 ';
+      else if (topic.includes('OpenMP')) prefix = '🧵 ';
+      else if (topic.includes('Monte Carlo')) prefix = '🎯 ';
+      else if (topic.includes('MapReduce') || topic.includes('HDFS')) prefix = '🗄️ ';
+
+      pill.textContent = `${prefix}${topic} (${count})`;
+      pill.addEventListener('click', () => handleTopicSelect(topic));
+      container.appendChild(pill);
+    }
+
+    // "Starred" Pill
+    const starBtn = document.createElement('button');
+    starBtn.className = `filter-pill ${state.activeTopic === 'starred' ? 'active' : ''}`;
+    starBtn.dataset.topic = 'starred';
+    starBtn.innerHTML = `⭐ Starred (<span id="starredCount">${state.starredIds.size}</span>)`;
+    starBtn.addEventListener('click', () => handleTopicSelect('starred'));
+    container.appendChild(starBtn);
+  }
+
+  function handleTopicSelect(topic) {
+    playSound('click');
+    state.activeTopic = topic;
+    document.querySelectorAll('#topicFilters .filter-pill').forEach(p => {
+      p.classList.toggle('active', p.dataset.topic === topic);
+    });
+
+    applyFilteringAndShuffling();
+
+    if (state.activeTab === 'practice') {
+      renderCurrentPracticeQuestion();
+    } else if (state.activeTab === 'flashcards') {
+      renderCurrentFlashcard();
+    } else if (state.activeTab === 'list') {
+      renderQuestionsList();
+    } else if (state.activeTab === 'exam') {
+      initExam();
+    }
   }
 
   function applyFilteringAndShuffling() {
@@ -185,7 +299,6 @@
     if (state.shuffleQuestions) {
       pool = fisherYatesShuffle(pool);
     } else {
-      // Sort in original ID order
       pool.sort((a, b) => a.id - b.id);
     }
 
@@ -202,7 +315,6 @@
 
   function reshuffleAll() {
     playSound('shuffle');
-    // Regenerate current options for all questions
     state.allQuestions.forEach(q => {
       q.currentOptions = prepareQuestionOptions(q, state.shuffleOptions);
     });
@@ -254,21 +366,16 @@
     const total = state.questions.length;
     const currentNum = state.currentPracticeIndex + 1;
 
-    // Badges & Progress
     countBadge.textContent = `Question ${currentNum} / ${total}`;
     topicBadge.textContent = q.topic;
-    origBadge.textContent = `Original PDF #${q.id}`;
+    origBadge.textContent = getOriginBadgeText(q);
     starBtn.classList.toggle('starred', state.starredIds.has(q.id));
     progFill.style.width = `${(currentNum / total) * 100}%`;
 
-    // Navigation state
     prevBtn.disabled = state.currentPracticeIndex === 0;
     nextBtn.disabled = state.currentPracticeIndex === total - 1;
 
-    // Question content (format markdown code block if present)
     qText.innerHTML = formatQuestionText(q.question);
-
-    // Render options
     optList.innerHTML = '';
     const answeredState = state.practiceAnswers[q.id];
 
@@ -355,7 +462,15 @@
     state.examActive = true;
     state.examSubmitted = false;
     state.examAnswers = {};
-    state.examTimeRemaining = 45 * 60; // 45 minutes
+
+    // Dynamic timer duration based on question count
+    const totalQ = state.questions.length;
+    let mins = 45;
+    if (totalQ <= 20) mins = 20;
+    else if (totalQ <= 40) mins = 35;
+    else if (totalQ > 50) mins = 75;
+
+    state.examTimeRemaining = mins * 60;
     state.currentExamIndex = 0;
 
     document.getElementById('examActiveView').classList.remove('hidden');
@@ -376,7 +491,7 @@
         updateTimerDisplay();
       } else {
         clearInterval(state.examTimerId);
-        submitExam(true); // time out
+        submitExam(true);
       }
     }, 1000);
   }
@@ -387,7 +502,7 @@
     const secs = state.examTimeRemaining % 60;
     const formatted = `${String(mins).padStart(2, '0')}:${String(secs).padStart(2, '0')}`;
     timerEl.textContent = `⏱️ ${formatted}`;
-    if (state.examTimeRemaining < 300) { // < 5 mins
+    if (state.examTimeRemaining < 300) {
       timerEl.classList.add('warning');
     } else {
       timerEl.classList.remove('warning');
@@ -588,12 +703,11 @@
 
     countBadge.textContent = `Card ${currentNum} / ${total}`;
     topicBadge.textContent = q.topic;
-    origBadge.textContent = `Original PDF #${q.id}`;
+    origBadge.textContent = getOriginBadgeText(q);
 
     prevBtn.disabled = state.currentFlashcardIndex === 0;
     nextBtn.disabled = state.currentFlashcardIndex === total - 1;
 
-    // Reset card to front
     frontEl.classList.remove('hidden');
     backEl.classList.add('hidden');
 
@@ -627,14 +741,12 @@
 
     let list = [...state.allQuestions];
 
-    // Topic filter
     if (state.activeTopic === 'starred') {
       list = list.filter(q => state.starredIds.has(q.id));
     } else if (state.activeTopic !== 'all') {
       list = list.filter(q => q.topic === state.activeTopic);
     }
 
-    // Search filter
     if (searchFilter) {
       list = list.filter(q => {
         const inQ = q.question.toLowerCase().includes(searchFilter);
@@ -662,7 +774,7 @@
       header.className = 'review-item-header';
       header.innerHTML = `
         <div class="meta-badges">
-          <span class="badge badge-source">#${q.id}</span>
+          <span class="badge badge-source">${getOriginBadgeText(q)}</span>
           <span class="badge badge-topic">${escapeHtml(q.topic)}</span>
         </div>
         <button class="star-btn ${isStarred ? 'starred' : ''}" data-id="${q.id}">★</button>
@@ -679,7 +791,6 @@
       optsDiv.style.gap = '0.4rem';
       optsDiv.style.marginBottom = '0.75rem';
 
-      // Always show options in original order or current order
       q.options.forEach(opt => {
         const isCorrect = opt.text === q.correctAnswerText;
         const optRow = document.createElement('div');
@@ -707,7 +818,6 @@
       item.appendChild(optsDiv);
       item.appendChild(explDiv);
 
-      // Star toggle click
       const starBtn = header.querySelector('.star-btn');
       starBtn.addEventListener('click', () => {
         toggleStar(q.id);
@@ -721,7 +831,6 @@
   // --- HELPERS ---
   function formatQuestionText(text) {
     if (!text) return '';
-    // Check if contains markdown code block ```c ... ```
     if (text.includes('```')) {
       const parts = text.split(/```(?:c|cpp)?/);
       let html = escapeHtml(parts[0]);
@@ -803,7 +912,7 @@
 
     const handleCancel = () => {
       modal.classList.add('hidden');
-      confirmBtn.removeEventListener('click', handleConfirm);
+      confirmBtn.removeEventListener('click', handleCancel);
       cancelBtn.removeEventListener('click', handleCancel);
     };
 
@@ -813,6 +922,16 @@
 
   // --- EVENT LISTENERS SETUP ---
   function setupEvents() {
+    // Pool switcher buttons
+    document.querySelectorAll('#poolSelectorButtons .pool-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const pool = btn.dataset.pool;
+        if (pool !== state.activePool) {
+          switchPool(pool);
+        }
+      });
+    });
+
     // Nav tabs
     document.querySelectorAll('.tab-btn').forEach(btn => {
       btn.addEventListener('click', () => {
@@ -837,28 +956,6 @@
           renderCurrentFlashcard();
         } else if (tab === 'list') {
           renderQuestionsList();
-        }
-      });
-    });
-
-    // Topic filters
-    document.querySelectorAll('.filter-pill').forEach(pill => {
-      pill.addEventListener('click', () => {
-        playSound('click');
-        document.querySelectorAll('.filter-pill').forEach(p => p.classList.remove('active'));
-        pill.classList.add('active');
-        state.activeTopic = pill.dataset.topic;
-
-        applyFilteringAndShuffling();
-
-        if (state.activeTab === 'practice') {
-          renderCurrentPracticeQuestion();
-        } else if (state.activeTab === 'flashcards') {
-          renderCurrentFlashcard();
-        } else if (state.activeTab === 'list') {
-          renderQuestionsList();
-        } else if (state.activeTab === 'exam') {
-          initExam();
         }
       });
     });
@@ -917,7 +1014,7 @@
     });
 
     document.getElementById('resetProgressBtn').addEventListener('click', () => {
-      showModal('Reset All Progress?', 'This will clear all your answered questions and statistics.', () => {
+      showModal('Reset All Progress?', 'This will clear all your answered questions and statistics for this session.', () => {
         state.practiceAnswers = {};
         state.examAnswers = {};
         savePersistedState();
@@ -986,7 +1083,6 @@
     });
 
     document.getElementById('practiceMissedBtn').addEventListener('click', () => {
-      // Find missed questions and set practice mode to only those
       const missed = state.questions.filter(q => state.examAnswers[q.id] !== q.correctAnswerText);
       if (missed.length > 0) {
         state.questions = missed;
@@ -1041,7 +1137,6 @@
 
     // Global keyboard shortcuts
     window.addEventListener('keydown', (e) => {
-      // Ignore if typing in search input
       if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
 
       const key = e.key;
@@ -1089,6 +1184,10 @@
   // --- BOOTSTRAP ---
   document.addEventListener('DOMContentLoaded', () => {
     loadPersistedState();
+    // Synchronize pool selector buttons with persisted pool
+    document.querySelectorAll('#poolSelectorButtons .pool-btn').forEach(btn => {
+      btn.classList.toggle('active', btn.dataset.pool === state.activePool);
+    });
     initData();
     setupEvents();
   });
